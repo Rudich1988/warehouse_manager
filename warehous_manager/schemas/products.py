@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -13,13 +13,6 @@ class ProductCreateSchema(BaseModel):
     quantity: int = Field(ge=0)
 
 
-class ProductResponseSchema(ProductCreateSchema):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    price: float
-
-
 class ProductUpdateSchema(BaseModel):
     model_config = ConfigDict(extra='forbid')
 
@@ -27,3 +20,13 @@ class ProductUpdateSchema(BaseModel):
     description: Optional[str] = Field(None, min_length=3)
     price: Optional[float] = Field(None, ge=0)
     quantity: Optional[int] = Field(None, ge=0)
+
+
+class ProductResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str
+    price: float
+    quantity: int

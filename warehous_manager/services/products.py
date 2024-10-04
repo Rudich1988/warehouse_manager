@@ -1,8 +1,11 @@
 from typing import List, Any
 
+from warehous_manager.models.orders import Order
 from warehous_manager.repositories.products import ProductRepository
 from warehous_manager.schemas.products import ProductResponseSchema
-from warehous_manager.db.db import Session
+from warehous_manager.schemas.order_items import OrderItemsSchema
+from warehous_manager.schemas.orders import OrderResponseSchema
+from warehous_manager.services.inventory_manager import InventoryManagerService
 
 
 class ProductService:
@@ -11,13 +14,17 @@ class ProductService:
 
     async def create(self, data: dict):
         product = await self.product_repo.add_one(data=data)
+        print(product.id)
         product_data = ProductResponseSchema.from_orm(
             product
         ).model_dump()
         return product_data
 
-    async def get(self, data: dict):
+    async def get(self, data):
         product = await self.product_repo.get_one(data=data)
+        product_data = ProductResponseSchema.from_orm(
+            product
+        ).model_dump()
         product_data = ProductResponseSchema.from_orm(
             product
         ).model_dump()
@@ -34,18 +41,8 @@ class ProductService:
         return products_data
 
     async def update(self, product_id: int, data: dict):
-        '''
-        если логика изменения количества товаров должна быть такой:
-        мы должны указать насколько единиц должен быть изменено кол-во товара
-        а не указываем количество товара. не знаю как правильно
-        if data['quantity']:
-            product = await self.product_repo.get_one(
-                data={'id':product_id}
-            )
-            data['quantity'] += product.quantity
-        '''
         product = await self.product_repo.update_one(
-            product_id=product_id,
+            object_id=product_id,
             data=data
         )
         product_data = ProductResponseSchema.from_orm(

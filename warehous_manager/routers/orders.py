@@ -29,9 +29,6 @@ async def create_order(request: Request):
     order_data = OrderCreateSchema.model_validate(
         request
     ).model_dump()
-    order_data = OrderCreateSchema.model_validate(
-        request
-    ).model_dump()
     async with db_session() as s:
         repository = OrderRepository(s)
         order = await OrderService(

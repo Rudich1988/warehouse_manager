@@ -55,15 +55,15 @@ class SQLAlchemyRepository(AbstractRepository):
             select(self.model))
         return products.scalars().all()
 
-    async def update_one(self, product_id: int, data: dict):
-        obj = await self.get_one({'id': product_id})
+    async def update_one(self, object_id: int, data: dict):
+        obj = await self.get_one({'id': object_id})
         for key, value in data.items():
             if value is not None:
                 setattr(obj, key, value)
         await self.session.flush()
         return obj
 
-    async def delete_one(self, data: dict) -> int:
+    async def delete_one(self, data: dict):
         obj = await self.get_one(data)
         await self.session.delete(obj)
         await self.session.flush()

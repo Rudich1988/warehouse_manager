@@ -7,7 +7,7 @@ from warehous_manager.models.order_items import OrderItem
 
 class OrderRepository(SQLAlchemyRepository):
     model = Order
-
+    '''
     async def get_one(self, data: dict):
         order_id = data['id']
         query = (
@@ -19,3 +19,4 @@ class OrderRepository(SQLAlchemyRepository):
             )
         result = await self.session.execute(query)
         return result.unique().scalars().one()
+    '''

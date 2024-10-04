@@ -34,6 +34,7 @@ class OrderItem(ModelBase):
         #backref='items',
         'Order',
         back_populates='items',
+        #lazy='selectin'
         #foreign_keys=[order_id]
 
     )
@@ -41,6 +42,6 @@ class OrderItem(ModelBase):
         #backref='items',
         'Product',
         back_populates='items',
-        lazy='select'
+        #lazy='selectin'
         #foreign_keys=[product_id]
     )
