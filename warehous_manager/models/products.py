@@ -33,4 +33,3 @@ class Product(ModelBase):
     )
 
     items = relationship('OrderItem')
-

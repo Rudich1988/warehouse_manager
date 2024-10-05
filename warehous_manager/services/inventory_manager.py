@@ -27,17 +27,11 @@ class InventoryManagerService:
         products_data = data['products']
         order_id = data['order_id']
         quantities = {product['id']: product['quantity'] for product in products_data}
-        #products_data = []
         order_cost = Decimal(0)
         orders_items_data = []
+
         for product in products:
             quantity = quantities.get(product.id)
-            #product_data = {
-             #   'id': product.id,
-              #  'name': product.name,
-               # 'price': float(product.price),
-                #'quantity': quantity
-            #3}
             order_item = {
                 'product_id': product.id,
                 'order_id': order_id,
@@ -47,10 +41,9 @@ class InventoryManagerService:
             }
             orders_items_data.append(order_item)
             order_cost += (product.price * quantity)
-            #products_data.append(product_data)
+
         order_data = {
             'order_cost': order_cost,
-            #'products': products_data,
             'order_items': orders_items_data
         }
         return order_data

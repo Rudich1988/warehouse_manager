@@ -19,36 +19,36 @@ class OrderService:
         inventory_manager = InventoryManagerService()
         product_count = inventory_manager.get_product_count(data['products'])
         order_data = {'status': Statuses.IN_PROGRESS, 'product_count': product_count}
+
         order = await self.order_repo.add_one(data=order_data)
+
         data['order_id'] = order.id
         products_data = inventory_manager.prepare_products_data(data['products'])
+
         products = await ProductRepository(session).update_objects(
             products_data['ids'],
             products_data['data']
         )
+
         order_data = inventory_manager.get_order_data(
             products=products,
             data=data
         )
+
         await OrderItemsRepository(
             session=session
         ).add_objects(data=order_data['order_items'])
+
         order.order_cost = order_data['order_cost']
-        return
-
-
-        #order_data['id'] = data['order_id']
-        #order_data['created_at'] = str(order.created_at)
-        #order_data['status'] = order.status
-        #order_data['order_cost'] = float(order_data['order_cost'])
-        print(order_data)
-        return
-        return order_data
+        order = await self.get(data={'id': order.id})
+        return order
 
     async def get(self, data: dict):
         data = await self.order_repo.get_one(data)
-        order = OrderResponseSchema.from_orm(data[0].Order).json()
-        return json.dumps(order)
+        order = OrderResponseSchema.from_orm(data[0].Order)
+        print(order.model_dump(mode='json'))
+
+        return order.model_dump(mode='json')
 
 
 

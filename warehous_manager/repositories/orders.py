@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 
 from warehous_manager.utils.repository import SQLAlchemyRepository
 from warehous_manager.models.orders import Order
-from warehous_manager.models.order_items import OrderItem
+
 
 class OrderRepository(SQLAlchemyRepository):
     model = Order
