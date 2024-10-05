@@ -1,5 +1,3 @@
-from enum import unique
-
 from sqlalchemy import select, func
 from sqlalchemy.dialects.postgresql import array_agg
 from sqlalchemy.orm import selectinload
@@ -21,7 +19,7 @@ class OrderRepository(SQLAlchemyRepository):
         '''
         query = (
             select(
-                unique(Order),  # Выбираем все поля из Order
+                unique(Order),
                 func.array_agg(
                     func.json_build_object(
                         'id', OrderItem.id,
@@ -29,11 +27,11 @@ class OrderRepository(SQLAlchemyRepository):
                         'product_price', OrderItem.product_price,
                         'quantity', OrderItem.quantity
                     )
-                ).label('items')  # Собираем данные из OrderItem в массив
+                ).label('items')
             )
-            .outerjoin(OrderItem, Order.id == OrderItem.order_id)  # Присоединяем order_items через LEFT JOIN
-            .where(Order.id == data['id'])  # Используем переменную id из data
-            .group_by(Order.id)  # Группируем по id заказа
+            .outerjoin(OrderItem, Order.id == OrderItem.order_id)
+            .where(Order.id == data['id'])
+            .group_by(Order.id)
         )
         '''
         order = await self.session.execute(query)
