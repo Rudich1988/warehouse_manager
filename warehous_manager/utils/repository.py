@@ -44,6 +44,12 @@ class SQLAlchemyRepository(AbstractRepository):
         await self.session.flush()
         return obj
 
+    async def add_objects(self, data):
+        objects = [self.model(**item) for item in data]
+        self.session.add_all(objects)
+        self.session.flush()
+        return [obj.id for obj in objects]
+
     async def get_one(self, data: dict):
         obj = await self.session.execute(
             select(self.model).filter_by(**data)

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a3c156bfe337
+Revision ID: 6d6bcb1d8c0f
 Revises: 
-Create Date: 2024-10-01 23:46:32.407338
+Create Date: 2024-10-05 00:28:17.770194
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a3c156bfe337'
+revision: str = '6d6bcb1d8c0f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,6 +24,8 @@ def upgrade() -> None:
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('status', sa.String(length=128), nullable=False),
+    sa.Column('order_cost', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('product_count', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('products',
@@ -43,17 +45,19 @@ def upgrade() -> None:
     op.create_table('order_items',
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('product_price', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('product_name', sa.String(length=128), nullable=False),
     sa.Column('order_id', sa.BigInteger(), nullable=False),
     sa.Column('product_id', sa.BigInteger(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_order_items_order_id'), 'order_items', ['order_id'], unique=False)
-    op.create_index(op.f('ix_order_items_product_id'), 'order_items', ['product_id'], unique=False)
     op.create_check_constraint(
         'check_positive_quantity', 'order_items', 'quantity > 0'
     )
+    op.create_index(op.f('ix_order_items_order_id'), 'order_items', ['order_id'], unique=False)
+    op.create_index(op.f('ix_order_items_product_id'), 'order_items', ['product_id'], unique=False)
     # ### end Alembic commands ###
 
 

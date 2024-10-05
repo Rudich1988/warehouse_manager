@@ -1,4 +1,7 @@
+import json
+
 from warehous_manager.repositories.orders import OrderRepository
+from warehous_manager.schemas.order_items import OrderItemsSchema
 from warehous_manager.schemas.orders import OrderResponseSchema
 from warehous_manager.enams.statuses import Statuses
 from warehous_manager.repositories.order_items import OrderItemsRepository
@@ -18,9 +21,6 @@ class OrderService:
         order_data = {'status': Statuses.IN_PROGRESS, 'product_count': product_count}
         order = await self.order_repo.add_one(data=order_data)
         data['order_id'] = order.id
-        orders_items = await OrderItemsRepository(
-            session
-        ).add_objects(data)
         products_data = inventory_manager.prepare_products_data(data['products'])
         products = await ProductRepository(session).update_objects(
             products_data['ids'],
@@ -28,29 +28,40 @@ class OrderService:
         )
         order_data = inventory_manager.get_order_data(
             products=products,
-            products_data=data['products']
+            data=data
         )
+        await OrderItemsRepository(
+            session=session
+        ).add_objects(data=order_data['order_items'])
         order.order_cost = order_data['order_cost']
-        order_data['id'] = data['order_id']
-        order_data['created_at'] = str(order.created_at)
-        order_data['status'] = order.status
-        order_data['order_cost'] = float(order_data['order_cost'])
+        return
+
+
+        #order_data['id'] = data['order_id']
+        #order_data['created_at'] = str(order.created_at)
+        #order_data['status'] = order.status
+        #order_data['order_cost'] = float(order_data['order_cost'])
+        print(order_data)
+        return
         return order_data
 
-
-        #order = OrderResponseSchema.from_orm(
-         #   order
-        #).model_dump()
-        #order['created_at'] = str(order['created_at'])
-        #order['products'] = products_items
-        #return order
-
     async def get(self, data: dict):
-        order = await self.order_repo.get_one(data)
-        #order_data = OrderResponseSchema.from_orm(
-         #   order
-        #)
-        #items = order.items
-        #print(items)
-        print(order.items[0].product)
-        return order
+        data = await self.order_repo.get_one(data)
+        order = OrderResponseSchema.from_orm(data[0].Order).json()
+        return json.dumps(order)
+
+
+
+
+        '''
+        order = data[0].Order
+        products = []
+        for related_objects in data:
+            order_item = OrderItemsSchema.from_orm(
+                related_objects.OrderItem
+            )
+            products.append(order_item)
+        order_data = OrderResponseSchema.from_orm(order)
+        order_data.items = products
+        return order_data
+        '''

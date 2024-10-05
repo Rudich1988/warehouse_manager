@@ -5,7 +5,7 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
 
 from warehous_manager.enams.statuses import Statuses
-
+from warehous_manager.schemas.order_items import OrderItemsSchema
 
 
 class OrderCreateSchema(BaseModel):
@@ -22,27 +22,9 @@ class OrderUpdateSchema(BaseModel):
     Statuses.DELIVERED
     ]
 
-'''
-class OrderResponseSchema(BaseModel):
-    model_config = ConfigDict(
-        from_attributes=True,
-        json_encoders={
-            datetime: lambda v: v.timestamp(),
-        }
-    )
-
-    id: int
-    status: Literal[
-        Statuses.IN_PROGRESS,
-        Statuses.SENT,
-        Statuses.DELIVERED
-    ]
-    created_at: datetime
-
-    #products: List[OrderItemsSchema]
-'''
 
 class OrderResponseSchema(BaseModel):
+    '''
     model_config = ConfigDict(
         from_attributes=True,
         json_encoders={
@@ -50,6 +32,7 @@ class OrderResponseSchema(BaseModel):
             datetime: lambda v: v.isoformat()
         }
     )
+    '''
 
     id: int
     created_at: datetime
@@ -58,8 +41,16 @@ class OrderResponseSchema(BaseModel):
         Statuses.SENT,
         Statuses.DELIVERED
     ]
-    products: list[dict]
+    items: list[OrderItemsSchema]
     order_cost: Decimal
+    product_count: int
 
-    #class Config:
-     #   orm_mode = True
+    class Config:
+        orm_mode = True
+        from_attributes = True
+        json_encoders = {
+            Decimal: lambda v: float(v),
+            datetime: lambda v: v.timestamp()
+        }
+
+OrderResponseSchema.model_rebuild()

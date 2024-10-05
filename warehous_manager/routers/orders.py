@@ -47,7 +47,6 @@ async def get_order(id: int):
         order = await OrderService(
             order_repo=repository
         ).get(data={'id': id})
-        return 'Hello'
     return JSONResponse(content=order, status_code=200)
     # except NoResultFound:
     #   return JSONResponse(content={'error': 'order not found'}, status_code=400)
