@@ -1,13 +1,9 @@
-import json
-
 from warehous_manager.repositories.orders import OrderRepository
-from warehous_manager.schemas.order_items import OrderItemsSchema
 from warehous_manager.schemas.orders import OrderResponseSchema
 from warehous_manager.enams.statuses import Statuses
 from warehous_manager.repositories.order_items import OrderItemsRepository
 from warehous_manager.db.db import Session
 from warehous_manager.repositories.products import ProductRepository
-from warehous_manager.services.products import ProductService
 from warehous_manager.services.inventory_manager import InventoryManagerService
 
 
@@ -46,22 +42,5 @@ class OrderService:
     async def get(self, data: dict):
         data = await self.order_repo.get_one(data)
         order = OrderResponseSchema.from_orm(data[0].Order)
-        print(order.model_dump(mode='json'))
-
         return order.model_dump(mode='json')
 
-
-
-
-        '''
-        order = data[0].Order
-        products = []
-        for related_objects in data:
-            order_item = OrderItemsSchema.from_orm(
-                related_objects.OrderItem
-            )
-            products.append(order_item)
-        order_data = OrderResponseSchema.from_orm(order)
-        order_data.items = products
-        return order_data
-        '''
