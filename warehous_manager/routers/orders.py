@@ -8,7 +8,7 @@ from pydantic_core._pydantic_core import ValidationError
 from warehous_manager.services.orders import OrderService
 from warehous_manager.db.db import db_session
 from warehous_manager.repositories.orders import OrderRepository
-from warehous_manager.schemas.orders import OrderCreateSchema, OrderUpdateSchema
+from warehous_manager.schemas.orders import OrderCreateSchema, OrderUpdateStatusSchema
 
 
 router = APIRouter(
@@ -19,7 +19,13 @@ router = APIRouter(
 
 @router.get('/')
 async def get_orders():
-    pass
+    #try:
+    async with db_session() as s:
+        repository = OrderRepository(s)
+        orders = await OrderService(
+            order_repo=repository
+        ).get_all()
+        return JSONResponse(content=orders, status_code=200)
 
 
 @router.post('/')
@@ -36,7 +42,7 @@ async def create_order(request: Request):
         ).create(data=order_data, session=s)
     return JSONResponse(content=order, status_code=201)
     # except ValidationError:
-    #   return return JSONResponse(content={'error': 'некорректные данные запроса'}, status_code=400)
+    #   return return JSONResponse(content={'error': 'incorrect request data'}, status_code=400)
 
 
 @router.get('/{id}')
@@ -58,9 +64,16 @@ async def get_order(id: int):
 async def update_order_status(id: int, request: Request):
     #try:
     request = await request.json()
-    order_data = OrderUpdateSchema.model_validate(
+    order_data = OrderUpdateStatusSchema.model_validate(
         request
     ).model_dump()
     async with db_session() as s:
         repository = OrderRepository(s)
-        order_data = OrderService
+        order_data = await OrderService(
+            order_repo=repository
+        ).update_order_status(status=order_data['status'], order_id=id)
+        return JSONResponse(content=order_data, status_code=201)
+    #except ValidationError:
+    #   return return JSONResponse(content={'error': 'incorrect request data'}, status_code=400)
+    # except NoResultFound:
+    #   return JSONResponse(content={'error': 'order not found'}, status_code=400)

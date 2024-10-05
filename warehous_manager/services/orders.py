@@ -40,7 +40,19 @@ class OrderService:
         return order
 
     async def get(self, data: dict):
-        data = await self.order_repo.get_one(data)
-        order = OrderResponseSchema.from_orm(data[0].Order)
-        return order.model_dump(mode='json')
+        order = await self.order_repo.get_one(data)
+        order_data = OrderResponseSchema.from_orm(order)
+        return order_data.model_dump(mode='json')
 
+    async def update_order_status(self, order_id: int, status: str):
+        order = await self.order_repo.get_one(data={'id': order_id})
+        order.status = status
+        order_data = await self.get(data={'id': order_id})
+        return order_data
+
+    async def get_all(self):
+        orders = await self.order_repo.get_objects()
+        orders_data = []
+        for order in orders:
+            orders_data.append(OrderResponseSchema.from_orm(order[0]).model_dump(mode='json'))
+        return orders_data

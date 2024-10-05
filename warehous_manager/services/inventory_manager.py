@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-from warehous_manager.repositories.order_items import OrderItemsRepository
-
 
 class InventoryManagerService:
     def get_product_count(self, products: list):
