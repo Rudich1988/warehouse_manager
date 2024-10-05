@@ -1,5 +1,3 @@
-from itertools import product
-
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from pydantic_core._pydantic_core import ValidationError

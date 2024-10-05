@@ -46,5 +46,5 @@ class OrderRepository(SQLAlchemyRepository):
             .options(selectinload(self.model.items))
         )
         orders = await self.session.execute(query)
-        orders_data = orders.fetchall()
+        orders_data = orders.scalars().all()
         return orders_data

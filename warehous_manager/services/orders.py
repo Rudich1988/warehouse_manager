@@ -60,7 +60,7 @@ class OrderService:
         orders_data = []
         for order in orders:
             orders_data.append(
-                OrderResponseSchema.from_orm(order[0])
+                OrderResponseSchema.from_orm(order)
                 .model_dump(mode='json')
             )
         return orders_data

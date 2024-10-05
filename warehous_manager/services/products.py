@@ -8,7 +8,6 @@ class ProductService:
 
     async def create(self, data: dict):
         product = await self.product_repo.add_one(data=data)
-        print(product.id)
         product_data = ProductResponseSchema.from_orm(
             product
         ).model_dump()
@@ -16,9 +15,6 @@ class ProductService:
 
     async def get(self, data):
         product = await self.product_repo.get_one(data=data)
-        product_data = ProductResponseSchema.from_orm(
-            product
-        ).model_dump()
         product_data = ProductResponseSchema.from_orm(
             product
         ).model_dump()
