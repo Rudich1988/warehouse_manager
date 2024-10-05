@@ -13,13 +13,18 @@ class OrderService:
 
     async def create(self, data: dict, session: Session):
         inventory_manager = InventoryManagerService()
-        product_count = inventory_manager.get_product_count(data['products'])
-        order_data = {'status': Statuses.IN_PROGRESS, 'product_count': product_count}
+        product_count = (inventory_manager
+                         .get_product_count(data['products']))
+        order_data = {
+            'status': Statuses.IN_PROGRESS,
+            'product_count': product_count
+        }
 
         order = await self.order_repo.add_one(data=order_data)
 
         data['order_id'] = order.id
-        products_data = inventory_manager.prepare_products_data(data['products'])
+        products_data = (inventory_manager
+                         .prepare_products_data(data['products']))
 
         products = await ProductRepository(session).update_objects(
             products_data['ids'],
@@ -54,5 +59,8 @@ class OrderService:
         orders = await self.order_repo.get_objects()
         orders_data = []
         for order in orders:
-            orders_data.append(OrderResponseSchema.from_orm(order[0]).model_dump(mode='json'))
+            orders_data.append(
+                OrderResponseSchema.from_orm(order[0])
+                .model_dump(mode='json')
+            )
         return orders_data
