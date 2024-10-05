@@ -8,3 +8,7 @@ load_dotenv()
 class Config(object):
     SECRET_KEY = os.getenv('SECRET_KEY')
     DATABASE_URL = os.getenv('DATABASE_URL')
+    DATABASE_URL_TEST = os.getenv(
+        'DATABASE_URL_TEST',
+        default=None
+    )
