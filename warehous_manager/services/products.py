@@ -23,7 +23,7 @@ class ProductService:
     async def get_all(self):
         products = await self.product_repo.get_objects()
         products_data = [
-            ProductResponseSchema.from_orm(
+            ProductResponseSchema.model_validate(
                 product
             ).model_dump()
             for product in products
