@@ -31,6 +31,11 @@ class OrderService:
             products_data['data']
         )
 
+        inventory_manager.check_products_existence(
+            products=products,
+            request_products=data['products']
+        )
+
         order_data = inventory_manager.get_order_data(
             products=products,
             data=data

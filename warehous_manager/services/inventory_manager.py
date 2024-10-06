@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from sqlalchemy.exc import NoResultFound
+
 
 class InventoryManagerService:
     def get_product_count(self, products: list):
@@ -45,3 +47,11 @@ class InventoryManagerService:
             'order_items': orders_items_data
         }
         return order_data
+
+    def check_products_existence(
+            self,
+            request_products,
+            products
+    ):
+        if len(request_products) != len(products):
+            raise NoResultFound()

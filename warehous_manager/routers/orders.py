@@ -48,9 +48,9 @@ async def create_order(request: Request):
                 order_repo=repository
             ).create(data=order_data, session=s)
         return JSONResponse(content=order, status_code=201)
-    except ValidationError:
+    except NoResultFound:
         return JSONResponse(
-            content={'error': 'incorrect request data'},
+            content={'error': 'product not found'},
             status_code=400
         )
     except Exception:
