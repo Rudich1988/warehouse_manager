@@ -1,4 +1,5 @@
 from decimal import Decimal
+from itertools import product
 
 from sqlalchemy.exc import NoResultFound
 
@@ -7,14 +8,14 @@ class InventoryManagerService:
     def get_product_count(self, products: list):
         products_quantity = 0
         for product in products:
-            products_quantity += product['quantity']
+            products_quantity += product.product_count
         return products_quantity
 
     def prepare_products_data(self, data: list):
         products_data = {}
         ids = []
         for product in data:
-            ids.append(product['id'])
+            ids.append(product.id)
         products_data['ids'] = ids
         products_data['data'] = data
         return products_data
@@ -22,11 +23,11 @@ class InventoryManagerService:
     def get_order_data(
             self,
             products: list,
-            data: dict
+            data
     ):
-        products_data = data['products']
-        order_id = data['order_id']
-        quantities = {product['id']: product['quantity'] for product in products_data}
+        products_data = data.products
+        order_id = data.order_id
+        quantities = {product.id: product.product_count for product in products_data}
         order_cost = Decimal(0)
         orders_items_data = []
 

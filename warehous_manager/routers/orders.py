@@ -1,13 +1,19 @@
+from dataclasses import asdict
+
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from pydantic_core._pydantic_core import ValidationError
 from sqlalchemy.exc import NoResultFound, IntegrityError
 
-
+from warehous_manager.dto.orders import OrderResponseDTO, OrderCreateDTO
+from warehous_manager.dto.products import ProductsItemsDTO
 from warehous_manager.services.orders import OrderService
 from warehous_manager.db.db import db_session
 from warehous_manager.repositories.orders import OrderRepository
-from warehous_manager.schemas.orders import OrderCreateSchema, OrderUpdateStatusSchema
+from warehous_manager.schemas.orders import (
+    OrderCreateSchema,
+    OrderUpdateStatusSchema
+)
 
 
 router = APIRouter(
@@ -16,7 +22,9 @@ router = APIRouter(
 )
 
 
-@router.get('/')
+@router.get('/',
+            response_model=list
+            )
 async def get_orders():
     try:
         async with db_session() as s:
@@ -24,6 +32,11 @@ async def get_orders():
             orders = await OrderService(
                 order_repo=repository
             ).get_all()
+            orders = [asdict(
+                order,
+                dict_factory=dict
+            ) for order in orders
+            ]
             return JSONResponse(
                 content=orders,
                 status_code=200
@@ -35,19 +48,32 @@ async def get_orders():
         )
 
 
-@router.post('/')
-async def create_order(request: Request):
-    try:
-        request = await request.json()
-        order_data = OrderCreateSchema.model_validate(
-            request
-        ).model_dump()
-        async with db_session() as s:
-            repository = OrderRepository(s)
-            order = await OrderService(
-                order_repo=repository
-            ).create(data=order_data, session=s)
-        return JSONResponse(content=order, status_code=201)
+@router.post('/',
+             response_model=OrderResponseDTO
+             )
+async def create_order(order_data: OrderCreateSchema):
+    #try:
+    products = [
+        ProductsItemsDTO(
+            **product.model_dump()
+        ) for product in order_data.products]
+    order_data = OrderCreateDTO(
+        products=products
+    )
+    #order_data = OrderCreateDTO(
+     #   **order_data.model_dump()
+    #)
+    async with db_session() as s:
+        repository = OrderRepository(s)
+        order = await OrderService(
+            order_repo=repository
+        ).create(data=order_data, session=s)
+    return JSONResponse(
+        content=asdict(order, dict_factory=dict),
+        status_code=201
+    )
+
+'''
     except NoResultFound:
         return JSONResponse(
             content={'error': 'product not found'},
@@ -58,18 +84,21 @@ async def create_order(request: Request):
             content={'error': 'server error'},
             status_code=500
         )
+    
 
-
-@router.get('/{id}')
+'''
+@router.get('/{id}',
+            response_model=OrderResponseDTO
+            )
 async def get_order(id: int):
     try:
         async with db_session() as s:
             repository = OrderRepository(s)
             order = await OrderService(
                 order_repo=repository
-            ).get(data={'id': id})
+            ).get(order_id=id)
         return JSONResponse(
-            content=order,
+            content=asdict(order, dict_factory=dict),
             status_code=200
         )
     except NoResultFound:
@@ -89,23 +118,27 @@ async def get_order(id: int):
         )
 
 
-@router.patch('/{id}/status')
-async def update_order_status(id: int, request: Request):
+@router.patch('/{id}/status',
+              response_model=OrderResponseDTO
+              )
+async def update_order_status(
+        id: int,
+        status: OrderUpdateStatusSchema
+):
     try:
-        request = await request.json()
-        order_data = OrderUpdateStatusSchema.model_validate(
-            request
-        ).model_dump()
         async with db_session() as s:
             repository = OrderRepository(s)
             order_data = await OrderService(
                 order_repo=repository
             ).update_order_status(
-                status=order_data['status'],
+                status=status.model_dump()['status'],
                 order_id=id
             )
             return JSONResponse(
-                content=order_data,
+                content=asdict(
+                    order_data,
+                    dict_factory=dict
+                ),
                 status_code=201
             )
     except ValidationError:
@@ -123,4 +156,3 @@ async def update_order_status(id: int, request: Request):
             content={'error': 'server error'},
             status_code=500
         )
-

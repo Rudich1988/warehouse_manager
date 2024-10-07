@@ -27,7 +27,7 @@ class Product(ModelBase):
         Numeric(precision=10, scale=2),
         CheckConstraint('price > 0')
     )
-    quantity: Mapped[int] = mapped_column(
+    product_count: Mapped[int] = mapped_column(
         Integer,
         CheckConstraint('quantity >= 0')
     )
