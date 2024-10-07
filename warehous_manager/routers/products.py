@@ -7,7 +7,8 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 
 from warehous_manager.schemas.products import (
     ProductCreateSchema,
-    ProductUpdateSchema
+    ProductUpdateSchema,
+    ProductDeleteSchema
 )
 from warehous_manager.db.db import db_session
 from warehous_manager.services.products import ProductService
@@ -159,7 +160,7 @@ async def update_product(
 
 @router.delete(
     '/{id}',
-    response_model=str
+    response_model=ProductDeleteSchema
 )
 async def delete_product(id: int):
     try:
@@ -168,8 +169,11 @@ async def delete_product(id: int):
             message = await ProductService(
                 product_repo=repository
             ).delete(product_id=id)
+        response = ProductDeleteSchema(
+            **{'id': id, 'message': message}
+        )
         return JSONResponse(
-            content={'success': message},
+            content=response.model_dump(),
             status_code=200
         )
     except NoResultFound:

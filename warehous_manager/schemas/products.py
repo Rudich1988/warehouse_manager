@@ -27,3 +27,8 @@ class ProductUpdateSchema(BaseModel):
     description: Optional[str] = Field(None, min_length=3)
     price: Optional[float] = Field(None, ge=0)
     product_count: Optional[int] = Field(None, ge=0)
+
+
+class ProductDeleteSchema(BaseModel):
+    id: int
+    message: str
