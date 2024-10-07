@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 6d6bcb1d8c0f
+Revision ID: d900996094f5
 Revises: 
-Create Date: 2024-10-05 00:28:17.770194
+Create Date: 2024-10-07 17:48:13.484426
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6d6bcb1d8c0f'
+revision: str = 'd900996094f5'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,24 +33,24 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('product_count', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_check_constraint(
         'check_positive_price', 'products', 'price > 0'
     )
     op.create_check_constraint(
-        'check_non_negative_quantity', 'products', 'quantity >= 0'
+        'check_non_negative_quantity', 'products', 'product_count >= 0'
     )
     op.create_table('order_items',
     sa.Column('id', sa.BigInteger(), autoincrement=True, nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('product_price', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('product_name', sa.String(length=128), nullable=False),
-    sa.Column('order_id', sa.BigInteger(), nullable=False),
-    sa.Column('product_id', sa.BigInteger(), nullable=False),
+    sa.Column('order_id', sa.BigInteger(), nullable=True),
+    sa.Column('product_id', sa.BigInteger(), nullable=True),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_check_constraint(
