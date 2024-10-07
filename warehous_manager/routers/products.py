@@ -25,9 +25,10 @@ router = APIRouter(
 )
 
 
-@router.post('/',
-             response_model=ProductResponseDTO
-             )
+@router.post(
+    '/',
+    response_model=ProductResponseDTO
+)
 async def create_product(product_data: ProductCreateSchema):
     try:
         product_data = ProductCreateDTO(
@@ -57,8 +58,10 @@ async def create_product(product_data: ProductCreateSchema):
         )
 
 
-@router.get('/',
-            response_model=list)
+@router.get(
+    '/',
+    response_model=list
+)
 async def get_products():
     try:
         async with db_session() as s:
@@ -83,9 +86,10 @@ async def get_products():
         )
 
 
-@router.get('/{id}',
-            response_model=ProductResponseDTO
-            )
+@router.get(
+    '/{id}',
+    response_model=ProductResponseDTO
+)
 async def get_product(id: int):
     try:
         async with db_session() as s:
@@ -116,9 +120,10 @@ async def get_product(id: int):
 
 
 
-@router.put('/{id}',
-            response_model=ProductResponseDTO
-            )
+@router.put(
+    '/{id}',
+    response_model=ProductResponseDTO
+)
 async def update_product(
         id: int,
         update_data: ProductUpdateSchema):
@@ -152,9 +157,10 @@ async def update_product(
         )
 
 
-@router.delete('/{id}',
-               response_model=str
-               )
+@router.delete(
+    '/{id}',
+    response_model=str
+)
 async def delete_product(id: int):
     try:
         async with db_session() as s:

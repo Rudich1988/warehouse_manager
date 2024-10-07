@@ -29,13 +29,16 @@ class OrderRepository(SQLAlchemyRepository):
         )
         return order
 
-    async def add_one(self, data: dict):
+    async def add_one(self, data: dict) -> id:
         order = self.model(**data)
         self.session.add(order)
         await self.session.flush()
         return order.id
 
-    async def get_one(self, order_id: int):
+    async def get_one(
+            self,
+            order_id: int
+    ) -> OrderResponseDTO:
         query = (
             select(self.model)
             .options(selectinload(self.model.items))
@@ -45,8 +48,7 @@ class OrderRepository(SQLAlchemyRepository):
         order_data = order.scalar_one()
         return self.create_order_dto(order_data)
 
-
-    async def get_objects(self):
+    async def get_objects(self) -> list:
         query = (
             select(self.model)
             .options(selectinload(self.model.items))
@@ -83,7 +85,7 @@ class OrderRepository(SQLAlchemyRepository):
             self,
             order_id: int,
             data: dict
-    ):
+    ) -> OrderResponseDTO:
         query = (
             select(self.model)
             .options(selectinload(self.model.items))

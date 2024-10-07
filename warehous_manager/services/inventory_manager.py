@@ -1,5 +1,4 @@
 from decimal import Decimal
-from itertools import product
 
 from sqlalchemy.exc import NoResultFound
 

@@ -13,7 +13,7 @@ from warehous_manager.dto.order_items import MidDataItemsDTO
 class ProductRepository(SQLAlchemyRepository):
     model = Product
 
-    def create_order_dto(self, product):
+    def create_product_dto(self, product):
         product_dto = ProductResponseDTO(
             id=product.id,
             name=product.name,
@@ -32,7 +32,7 @@ class ProductRepository(SQLAlchemyRepository):
         )
         self.session.add(product)
         await self.session.flush()
-        product_dto = self.create_order_dto(product)
+        product_dto = self.create_product_dto(product)
         return product_dto
 
     async def get_one(
@@ -43,7 +43,7 @@ class ProductRepository(SQLAlchemyRepository):
             select(self.model).filter_by(id=product_id)
         )
         product_data = product.scalars().one()
-        product_dto = self.create_order_dto(product_data)
+        product_dto = self.create_product_dto(product_data)
         return product_dto
 
     async def get_objects(self) -> list:
@@ -52,7 +52,7 @@ class ProductRepository(SQLAlchemyRepository):
         products = products.scalars().all()
         result = []
         for product in products:
-            product_dto = self.create_order_dto(product)
+            product_dto = self.create_product_dto(product)
             result.append(product_dto)
         return result
 
@@ -70,20 +70,15 @@ class ProductRepository(SQLAlchemyRepository):
             if value is not None:
                 setattr(product, key, value)
         await self.session.flush()
-        product_dto = self.create_order_dto(product)
+        product_dto = self.create_product_dto(product)
         return product_dto
 
     async def delete_one(
             self,
             product_id: int,
     ) -> None:
-        product = await self.get_one(
-            product_id=product_id
-        )
-        stmt = delete(self.model)
-        for key, value in asdict(product, dict_factory=dict).items():
-            stmt = stmt.where(getattr(self.model, key) == value)
-        self.session.execute(stmt)
+        stmt = delete(self.model).where(self.model.id == product_id)
+        await self.session.execute(stmt)
         await self.session.flush()
 
 

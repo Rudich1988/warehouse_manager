@@ -22,9 +22,10 @@ router = APIRouter(
 )
 
 
-@router.get('/',
-            response_model=list
-            )
+@router.get(
+    '/',
+    response_model=list
+)
 async def get_orders():
     try:
         async with db_session() as s:
@@ -48,36 +49,32 @@ async def get_orders():
         )
 
 
-@router.post('/',
-             response_model=OrderResponseDTO
-             )
+@router.post(
+    '/',
+    response_model=OrderResponseDTO
+)
 async def create_order(order_data: OrderCreateSchema):
-    #try:
-    products = [
-        ProductsItemsDTO(
-            **product.model_dump()
-        ) for product in order_data.products]
-    order_data = OrderCreateDTO(
-        products=products
-    )
-    #order_data = OrderCreateDTO(
-     #   **order_data.model_dump()
-    #)
-    async with db_session() as s:
-        repository = OrderRepository(s)
-        order = await OrderService(
-            order_repo=repository
-        ).create(data=order_data, session=s)
-    return JSONResponse(
-        content=asdict(order, dict_factory=dict),
-        status_code=201
-    )
-
-'''
+    try:
+        products = [
+            ProductsItemsDTO(
+                **product.model_dump()
+            ) for product in order_data.products]
+        order_data = OrderCreateDTO(
+            products=products
+        )
+        async with db_session() as s:
+            repository = OrderRepository(s)
+            order = await OrderService(
+                order_repo=repository
+            ).create(data=order_data, session=s)
+        return JSONResponse(
+            content=asdict(order, dict_factory=dict),
+            status_code=201
+        )
     except NoResultFound:
         return JSONResponse(
             content={'error': 'product not found'},
-            status_code=400
+            status_code=404
         )
     except Exception:
         return JSONResponse(
@@ -86,10 +83,10 @@ async def create_order(order_data: OrderCreateSchema):
         )
     
 
-'''
-@router.get('/{id}',
-            response_model=OrderResponseDTO
-            )
+@router.get(
+    '/{id}',
+    response_model=OrderResponseDTO
+)
 async def get_order(id: int):
     try:
         async with db_session() as s:
@@ -104,7 +101,7 @@ async def get_order(id: int):
     except NoResultFound:
         return JSONResponse(
             content={'error': 'order not found'},
-            status_code=400
+            status_code=404
         )
     except IntegrityError:
         return JSONResponse(
@@ -118,9 +115,10 @@ async def get_order(id: int):
         )
 
 
-@router.patch('/{id}/status',
-              response_model=OrderResponseDTO
-              )
+@router.patch(
+    '/{id}/status',
+    response_model=OrderResponseDTO
+)
 async def update_order_status(
         id: int,
         status: OrderUpdateStatusSchema
@@ -149,7 +147,7 @@ async def update_order_status(
     except NoResultFound:
         return JSONResponse(
             content={'error': 'order not found'},
-            status_code=400
+            status_code=404
         )
     except Exception:
         return JSONResponse(
