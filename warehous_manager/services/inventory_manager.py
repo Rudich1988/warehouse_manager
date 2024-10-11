@@ -36,7 +36,7 @@ class InventoryManagerService:
                 'product_id': product.id,
                 'order_id': order_id,
                 'product_price': product.price,
-                'quantity': quantity,
+                'product_count': quantity,
                 'product_name': product.name
             }
             orders_items_data.append(order_item)

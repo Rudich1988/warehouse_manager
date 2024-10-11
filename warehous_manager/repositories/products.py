@@ -1,5 +1,6 @@
 from sqlalchemy import update, case, select, delete
 from dataclasses import asdict
+from sqlalchemy.exc import NoResultFound
 
 from warehous_manager.utils.repository import SQLAlchemyRepository
 from warehous_manager.models.products import Product
@@ -62,25 +63,33 @@ class ProductRepository(SQLAlchemyRepository):
             product_id: int,
             data: ProductUpdateDTO
     ) -> ProductResponseDTO:
-        product = await self.get_one(product_id=product_id)
+        fields = {}
         for key, value in asdict(
                 data,
                 dict_factory=dict
         ).items():
-            if value is not None:
-                setattr(product, key, value)
-        await self.session.flush()
+            if value:
+                fields[key] = value
+        stmt = (
+            update(self.model)
+            .where(self.model.id == product_id)
+            .values(fields)
+            .returning(self.model)
+        )
+        result = await self.session.execute(stmt)
+        product = result.scalar_one()
         product_dto = self.create_product_dto(product)
         return product_dto
+
 
     async def delete_one(
             self,
             product_id: int,
     ) -> None:
         stmt = delete(self.model).where(self.model.id == product_id)
-        await self.session.execute(stmt)
-        await self.session.flush()
-
+        result = await self.session.execute(stmt)
+        if result.rowcount == 0:
+            raise NoResultFound
 
 
     async def update_objects(self, ids: list[int], data):

@@ -29,6 +29,11 @@ class ProductUpdateSchema(BaseModel):
     product_count: Optional[int] = Field(None, ge=0)
 
 
-class ProductDeleteSchema(BaseModel):
+class ProductResponseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
-    message: str
+    name: str
+    description: str
+    price: float
+    quantity: int

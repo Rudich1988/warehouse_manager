@@ -7,7 +7,7 @@ class OrderItemsSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    quantity: int
+    product_count: int
     product_price: CustomDecimal
     product_name: str
 

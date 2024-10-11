@@ -14,7 +14,7 @@ class OrderRepository(SQLAlchemyRepository):
         items = order_data.items
         order_items = [
             OrderItemsDTO(
-                quantity=item.quantity,
+                product_count=item.product_count,
                 product_name=item.product_name,
                 product_price=item.product_price
             ) for item in items
@@ -96,5 +96,3 @@ class OrderRepository(SQLAlchemyRepository):
         order_data.status = data['status']
         order = self.create_order_dto(order_data)
         return order
-
-

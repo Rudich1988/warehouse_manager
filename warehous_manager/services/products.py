@@ -33,4 +33,3 @@ class ProductService:
         await self.product_repo.delete_one(
             product_id=product_id
         )
-        return f'product deleted'

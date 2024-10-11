@@ -10,7 +10,6 @@ from warehous_manager.dto.products import (
     ProductCreateDTO)
 
 
-
 async def create_product(mocker):
     product_data = ProductCreateDTO(
         name='Test Name',
@@ -95,9 +94,9 @@ async def test_delete_product(mocker):
     mock_repo = mocker.MagicMock(ProductRepository)
     mock_repo.get_one = AsyncMock(return_value=mock_product)
     service = ProductService(product_repo=mock_repo)
-    message = await service.delete(product_id=product_id)
+    result = await service.delete(product_id=product_id)
 
-    assert message == f'product deleted'
+    assert result is None
 
 
 @pytest.mark.asyncio

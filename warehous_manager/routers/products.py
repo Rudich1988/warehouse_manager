@@ -1,21 +1,20 @@
 from dataclasses import asdict
-
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from pydantic_core._pydantic_core import ValidationError
-from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy.exc import NoResultFound
+from fastapi import status
 
 from warehous_manager.schemas.products import (
     ProductCreateSchema,
     ProductUpdateSchema,
-    ProductDeleteSchema
+    ProductResponseSchema
 )
 from warehous_manager.db.db import db_session
 from warehous_manager.services.products import ProductService
 from warehous_manager.repositories.products import ProductRepository
 from warehous_manager.dto.products import (
     ProductCreateDTO,
-    ProductResponseDTO,
     ProductUpdateDTO
 )
 
@@ -28,7 +27,7 @@ router = APIRouter(
 
 @router.post(
     '/',
-    response_model=ProductResponseDTO
+    response_model=ProductResponseSchema
 )
 async def create_product(product_data: ProductCreateSchema):
     try:
@@ -61,7 +60,7 @@ async def create_product(product_data: ProductCreateSchema):
 
 @router.get(
     '/',
-    response_model=list
+    response_model=list[ProductResponseSchema]
 )
 async def get_products():
     try:
@@ -89,7 +88,7 @@ async def get_products():
 
 @router.get(
     '/{id}',
-    response_model=ProductResponseDTO
+    response_model=ProductResponseSchema
 )
 async def get_product(id: int):
     try:
@@ -110,7 +109,7 @@ async def get_product(id: int):
     except NoResultFound:
         return JSONResponse(
             content={'error': 'product not found'},
-            status_code=400
+            status_code=404
         )
     except Exception:
         return JSONResponse(
@@ -119,11 +118,9 @@ async def get_product(id: int):
         )
 
 
-
-
 @router.put(
     '/{id}',
-    response_model=ProductResponseDTO
+    response_model=ProductResponseSchema
 )
 async def update_product(
         id: int,
@@ -144,12 +141,7 @@ async def update_product(
     except ValidationError:
         return JSONResponse(
             content={'error': 'incorrect request data'},
-            status_code=400
-        )
-    except IntegrityError:
-        return JSONResponse(
-            content={'error': 'incorrect request data'},
-            status_code=400
+            status_code=422
         )
     except Exception:
         return JSONResponse(
@@ -160,26 +152,19 @@ async def update_product(
 
 @router.delete(
     '/{id}',
-    response_model=ProductDeleteSchema
+    status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_product(id: int):
     try:
         async with db_session() as s:
             repository = ProductRepository(s)
-            message = await ProductService(
+            await ProductService(
                 product_repo=repository
             ).delete(product_id=id)
-        response = ProductDeleteSchema(
-            **{'id': id, 'message': message}
-        )
-        return JSONResponse(
-            content=response.model_dump(),
-            status_code=200
-        )
     except NoResultFound:
         return JSONResponse(
             content={'error': 'product not found'},
-            status_code=400
+            status_code=404
         )
     except Exception:
         return JSONResponse(

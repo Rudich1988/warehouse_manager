@@ -15,7 +15,7 @@ class OrderItem(ModelBase):
         primary_key=True,
         autoincrement=True
     )
-    quantity: Mapped[int] = mapped_column()
+    product_count: Mapped[int] = mapped_column()
     product_price: Mapped[Decimal] = mapped_column(
         Numeric(precision=10, scale=2)
     )
@@ -26,7 +26,8 @@ class OrderItem(ModelBase):
             ondelete='CASCADE'
         ),
         nullable=True,
-        index=True
+        index=True,
+        name='ix_order_items_order_id'
     )
     product_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey(
@@ -34,7 +35,8 @@ class OrderItem(ModelBase):
             ondelete='SET NULL'
         ),
         nullable=True,
-        index=True
+        index=True,
+        name='ix_order_items_product_id'
     )
 
     order: Mapped['Order'] = relationship(

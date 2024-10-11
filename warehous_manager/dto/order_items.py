@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderItemsDTO:
-    quantity: int
+    product_count: int
     product_price: Decimal
     product_name: str
 
@@ -15,5 +15,5 @@ class OrderItemsDTO:
 @dataclass
 class MidDataItemsDTO:
     id: int
-    price: int
-    name: int
+    price: Decimal#int
+    name: str#int

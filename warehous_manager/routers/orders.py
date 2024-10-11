@@ -12,7 +12,8 @@ from warehous_manager.db.db import db_session
 from warehous_manager.repositories.orders import OrderRepository
 from warehous_manager.schemas.orders import (
     OrderCreateSchema,
-    OrderUpdateStatusSchema
+    OrderUpdateStatusSchema,
+    OrderResponseSchema
 )
 
 
@@ -24,7 +25,7 @@ router = APIRouter(
 
 @router.get(
     '/',
-    response_model=list
+    response_model=list[OrderResponseSchema]
 )
 async def get_orders():
     try:
@@ -51,7 +52,7 @@ async def get_orders():
 
 @router.post(
     '/',
-    response_model=OrderResponseDTO
+    response_model=OrderResponseSchema
 )
 async def create_order(order_data: OrderCreateSchema):
     try:
@@ -85,7 +86,7 @@ async def create_order(order_data: OrderCreateSchema):
 
 @router.get(
     '/{id}',
-    response_model=OrderResponseDTO
+    response_model=OrderResponseSchema
 )
 async def get_order(id: int):
     try:
@@ -117,7 +118,7 @@ async def get_order(id: int):
 
 @router.patch(
     '/{id}/status',
-    response_model=OrderResponseDTO
+    response_model=OrderResponseSchema
 )
 async def update_order_status(
         id: int,
