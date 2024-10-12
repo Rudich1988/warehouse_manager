@@ -14,3 +14,13 @@ poetry install
 poetry shell
 make dev
 ```
+
+- Docker:
+```bash
+cp env.example .env
+```
+- Docker build and run:
+```bash
+docker-compose build
+docker-compose up
+```

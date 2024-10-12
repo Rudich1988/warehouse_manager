@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16.4-alpine
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=warehous
+      - POSTGRES_USER=warehous
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - "5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - ./:/app
+
+volumes:
+  db_data:

@@ -4,13 +4,13 @@ from sqlalchemy.exc import NoResultFound
 
 
 class InventoryManagerService:
-    def get_product_count(self, products: list):
+    def get_product_count(self, products: list) -> int:
         products_quantity = 0
         for product in products:
             products_quantity += product.product_count
         return products_quantity
 
-    def prepare_products_data(self, data: list):
+    def prepare_products_data(self, data: list) -> dict:
         products_data = {}
         ids = []
         for product in data:
@@ -23,7 +23,7 @@ class InventoryManagerService:
             self,
             products: list,
             data
-    ):
+    ) -> dict:
         products_data = data.products
         order_id = data.order_id
         quantities = {product.id: product.product_count for product in products_data}

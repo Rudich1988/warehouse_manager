@@ -1,4 +1,4 @@
-from warehous_manager.dto.orders import OrderCreateDTO
+from warehous_manager.dto.orders import OrderCreateDTO, OrderResponseDTO
 from warehous_manager.repositories.orders import OrderRepository
 from warehous_manager.enams.statuses import Statuses
 from warehous_manager.repositories.order_items import OrderItemsRepository
@@ -15,7 +15,7 @@ class OrderService:
             self,
             data: OrderCreateDTO,
             session: Session
-    ):
+    ) -> OrderResponseDTO:
         inventory_manager = InventoryManagerService()
         product_count = (inventory_manager
                          .get_product_count(data.products))
@@ -55,7 +55,7 @@ class OrderService:
         )
         return order
 
-    async def get(self, order_id: int):
+    async def get(self, order_id: int) -> OrderResponseDTO:
         return await self.order_repo.get_one(order_id=order_id)
 
 
@@ -63,12 +63,12 @@ class OrderService:
             self,
             order_id: int,
             status: str
-    ):
+    ) -> OrderResponseDTO:
         order = await self.order_repo.update_status(
             order_id=order_id,
             data={'status': status}
         )
         return order
 
-    async def get_all(self):
+    async def get_all(self) -> list:
         return await self.order_repo.get_objects()
