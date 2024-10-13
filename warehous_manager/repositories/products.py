@@ -92,7 +92,7 @@ class ProductRepository(SQLAlchemyRepository):
             raise NoResultFound
 
 
-    async def update_objects(self, ids: list[int], data):
+    async def update_products(self, ids: list[int], data):
         field_updates = {
             'product_count': case(
                 *[

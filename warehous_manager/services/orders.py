@@ -30,7 +30,7 @@ class OrderService:
         products_data = (inventory_manager
                          .prepare_products_data(data.products))
 
-        products = await ProductRepository(session).update_objects(
+        products = await ProductRepository(session).update_products(
             products_data['ids'],
             products_data['data']
         )

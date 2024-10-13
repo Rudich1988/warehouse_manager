@@ -2,7 +2,7 @@ from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import BigInteger, ForeignKey, Numeric, String
+from sqlalchemy import BigInteger, ForeignKey, Numeric, String, UniqueConstraint, Index
 
 from warehous_manager.db.db import ModelBase
 
@@ -27,7 +27,6 @@ class OrderItem(ModelBase):
         ),
         nullable=True,
         index=True,
-        name='ix_order_items_order_id'
     )
     product_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey(
@@ -35,8 +34,7 @@ class OrderItem(ModelBase):
             ondelete='SET NULL'
         ),
         nullable=True,
-        index=True,
-        name='ix_order_items_product_id'
+        index=True
     )
 
     order: Mapped['Order'] = relationship(
@@ -47,4 +45,14 @@ class OrderItem(ModelBase):
     product: Mapped[Optional['Product']] = relationship(
         'Product',
         back_populates='items'
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            'order_id',
+            'product_id',
+            name='ix_order_id_product_id'
+        ),
+        Index('ix_order_items_order_id', 'order_id'),
+        Index('ix_order_items_product_id', 'product_id')
     )
