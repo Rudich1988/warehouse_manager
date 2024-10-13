@@ -51,7 +51,7 @@ class OrderItem(ModelBase):
         UniqueConstraint(
             'order_id',
             'product_id',
-            name='ix_order_id_product_id'
+            name='ix_order_items_order_id_product_id'
         ),
         Index('ix_order_items_order_id', 'order_id'),
         Index('ix_order_items_product_id', 'product_id')
