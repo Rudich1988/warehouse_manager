@@ -25,16 +25,14 @@ class OrderItem(ModelBase):
             'orders.id',
             ondelete='CASCADE'
         ),
-        nullable=True,
-        index=True,
+        nullable=True
     )
     product_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey(
             'products.id',
             ondelete='SET NULL'
         ),
-        nullable=True,
-        index=True
+        nullable=True
     )
 
     order: Mapped['Order'] = relationship(
@@ -53,6 +51,4 @@ class OrderItem(ModelBase):
             'product_id',
             name='ix_order_items_order_id_product_id'
         ),
-        Index('ix_order_items_order_id', 'order_id'),
-        Index('ix_order_items_product_id', 'product_id')
     )
